@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST(_: NextRequest) {
   const n8nClearWebhookUrl = process.env.N8N_CLEAR_URL;
 
   if (!n8nClearWebhookUrl) {
@@ -14,21 +14,14 @@ export async function POST(request: NextRequest) {
   try {
     const n8nResponse = await fetch(n8nClearWebhookUrl, { method: 'POST' });
 
-    if (!n8nResponse.ok) {
-      throw new Error(`O n8n respondeu com status: ${n8nResponse.status}`);
-    }
+    if (!n8nResponse.ok) throw new Error(`O n8n respondeu com status: ${n8nResponse.status}`);
 
-    const result: any = await n8nResponse.json().catch(() => ({}));
-
+    const result = (await n8nResponse.json().catch(() => ({}))) as Record<string, unknown>;
     console.log('Limpeza executada:', result);
 
-    return NextResponse.json(
-      { message: 'Dados limpos', details: result },
-      { status: 200 }
-    );
-
+    return NextResponse.json({ message: 'Dados limpos', details: result }, { status: 200 });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Um erro desconhecido ocorreu';
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
     console.error('Erro ao chamar:', errorMessage);
 
     return NextResponse.json(
