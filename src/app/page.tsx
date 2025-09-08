@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 interface User {
   id: number;
   nome: string;
@@ -38,7 +39,7 @@ export default function HomePage() {
               'email' in u &&
               'phone' in u
             ) {
-              const obj = u as { id: unknown; nome: unknown; email: unknown; phone: unknown };
+              const obj = u as Record<string, unknown>;
               return {
                 id: typeof obj.id === 'number' ? obj.id : 0,
                 nome: typeof obj.nome === 'string' ? obj.nome : 'N/A',

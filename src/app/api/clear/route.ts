@@ -5,10 +5,7 @@ export async function POST(_: NextRequest) {
 
   if (!n8nClearWebhookUrl) {
     console.error('Variável de ambiente N8N_CLEAR_URL não está definida.');
-    return NextResponse.json(
-      { message: 'Erro de configuração no servidor.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Erro de configuração no servidor.' }, { status: 500 });
   }
 
   try {
@@ -24,9 +21,6 @@ export async function POST(_: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
     console.error('Erro ao chamar:', errorMessage);
 
-    return NextResponse.json(
-      { message: 'Falha ao executar a limpeza.', error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Falha ao executar a limpeza.', error: errorMessage }, { status: 500 });
   }
 }
