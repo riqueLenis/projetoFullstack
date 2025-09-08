@@ -1,16 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-
-interface EncryptedPackage {
-  iv: string;
-  authTag: string;
-  encrypted: string;
-}
-
-interface DataPackage {
-  encrypted: EncryptedPackage;
-  secretKey: string;
-}
 
 export async function POST(_: NextRequest) {
   const encryptedDataUrl = process.env.ENCRYPTED_DATA_URL;
@@ -22,15 +13,10 @@ export async function POST(_: NextRequest) {
 
   try {
     const encryptedResponse = await fetch(encryptedDataUrl);
-    if (!encryptedResponse.ok) throw new Error('Falha ao buscar os dados criptografados.');
+    const dataPackage = await encryptedResponse.json();
+    const { iv, authTag, encrypted } = dataPackage.data.encrypted;
+    const { secretKey } = dataPackage.data;
 
-    const dataPackageResponse = (await encryptedResponse.json()) as { data: DataPackage } | null;
-    if (!dataPackageResponse?.data) throw new Error('Dados inválidos do endpoint.');
-
-    const { encrypted, secretKey } = dataPackageResponse.data;
-    if (!encrypted || !secretKey) throw new Error('Campos criptografados ausentes.');
-
-    const { iv, authTag, encrypted: encryptedText } = encrypted;
     const key = Buffer.from(secretKey, 'hex');
     const ivBuffer = Buffer.from(iv, 'hex');
     const authTagBuffer = Buffer.from(authTag, 'hex');
@@ -38,8 +24,10 @@ export async function POST(_: NextRequest) {
     const decipher = crypto.createDecipheriv('aes-256-gcm', key, ivBuffer);
     decipher.setAuthTag(authTagBuffer);
 
-    const decryptedText = decipher.update(encryptedText, 'hex', 'utf8') + decipher.final('utf8');
-    const decryptedData = JSON.parse(decryptedText) as unknown;
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    const decryptedData = JSON.parse(decrypted);
 
     const n8nResponse = await fetch(n8nAddWebhookUrl, {
       method: 'POST',
@@ -47,31 +35,21 @@ export async function POST(_: NextRequest) {
       body: JSON.stringify(decryptedData),
     });
 
-    if (!n8nResponse.ok) throw new Error(`O n8n respondeu com status: ${n8nResponse.status}`);
-
-    const usersFromN8N = (await n8nResponse.json()) as unknown;
-    const finalData: Array<Record<string, unknown>> = [];
+    const usersFromN8N = await n8nResponse.json();
+    let finalData;
 
     if (Array.isArray(usersFromN8N)) {
-      for (const item of usersFromN8N) {
-        if (item && typeof item === 'object' && 'json' in item) {
-          finalData.push((item as { json: Record<string, unknown> }).json);
-        } else if (item && typeof item === 'object') {
-          finalData.push(item as Record<string, unknown>);
-        }
-      }
+      finalData = usersFromN8N.map((item: any) => item.json ?? item);
     } else if (usersFromN8N && typeof usersFromN8N === 'object') {
-      if ('json' in usersFromN8N) {
-        finalData.push((usersFromN8N as { json: Record<string, unknown> }).json);
-      } else {
-        finalData.push(usersFromN8N as Record<string, unknown>);
-      }
+      finalData = [usersFromN8N.json ?? usersFromN8N];
+    } else {
+      finalData = [];
     }
 
     return NextResponse.json(finalData, { status: 200 });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
     console.error('Erro no fluxo de execução:', errorMessage);
-    return NextResponse.json({ message: 'Ocorreu um erro no fluxo de execução: ' + errorMessage }, { status: 500 });
+    return NextResponse.json({ message: 'Erro: ' + errorMessage }, { status: 500 });
   }
 }

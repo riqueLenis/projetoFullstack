@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -27,28 +28,15 @@ export default function HomePage() {
         throw new Error(errorData.message || 'Falha ao buscar e processar os dados.');
       }
 
-      const data = (await response.json()) as unknown;
+      const data = await response.json();
 
       const normalizedData: User[] = Array.isArray(data)
-        ? data.map((u) => {
-            if (
-              u &&
-              typeof u === 'object' &&
-              'id' in u &&
-              'nome' in u &&
-              'email' in u &&
-              'phone' in u
-            ) {
-              const obj = u as Record<string, unknown>;
-              return {
-                id: typeof obj.id === 'number' ? obj.id : 0,
-                nome: typeof obj.nome === 'string' ? obj.nome : 'N/A',
-                email: typeof obj.email === 'string' ? obj.email : 'N/A',
-                phone: typeof obj.phone === 'string' ? obj.phone : 'N/A',
-              };
-            }
-            return { id: 0, nome: 'N/A', email: 'N/A', phone: 'N/A' };
-          })
+        ? data.map((u: any) => ({
+            id: u.id ?? 0,
+            nome: u.nome ?? 'N/A',
+            email: u.email ?? 'N/A',
+            phone: u.phone ?? 'N/A',
+          }))
         : [];
 
       setUsers(normalizedData);

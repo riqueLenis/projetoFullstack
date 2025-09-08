@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(_: NextRequest) {
@@ -13,7 +14,7 @@ export async function POST(_: NextRequest) {
 
     if (!n8nResponse.ok) throw new Error(`O n8n respondeu com status: ${n8nResponse.status}`);
 
-    const result = (await n8nResponse.json().catch(() => ({}))) as Record<string, unknown>;
+    const result = await n8nResponse.json().catch(() => ({}));
     console.log('Limpeza executada:', result);
 
     return NextResponse.json({ message: 'Dados limpos', details: result }, { status: 200 });
