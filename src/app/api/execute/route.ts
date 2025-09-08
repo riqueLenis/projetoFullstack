@@ -4,37 +4,35 @@ import crypto from 'crypto';
 export async function POST(request: Request) {
   const encryptedDataUrl = process.env.ENCRYPTED_DATA_URL;
   const n8nAddWebhookUrl = process.env.N8N_ADD_URL;
-  const SECRET_KEY_FIXA = "COLOQUE_A_CHAVE_SECRETA_FIXA_AQUI_EM_FORMATO_HEXADECIMAL";
 
   if (!encryptedDataUrl || !n8nAddWebhookUrl) {
-    return NextResponse.json({ message: "Erro de configuração no servidor." }, { status: 500 });
+    return NextResponse.json({ message: "erro de config no servidor." }, { status: 500 });
   }
 
   try {
     const encryptedResponse = await fetch(encryptedDataUrl);
-    if (!encryptedResponse.ok) throw new Error("Falha ao buscar os dados criptografados.");
+    if (!encryptedResponse.ok) throw new Error("falha ao buscar os dados criptografados.");
 
     const dataPackage = await encryptedResponse.json();
     const { iv, authTag, encrypted } = dataPackage.data.encrypted;
+    const { secretKey } = dataPackage.data;
 
-    if (!iv || !authTag || !encrypted) {
-        throw new Error("Formato de dados criptografados inválido recebido do endpoint.");
+    if (!iv || !authTag || !encrypted || !secretKey) {
+        throw new Error("a resposta do endpoint não contem todos os campos necessarios.");
     }
 
-    console.log("Iniciando descriptografia...");
-
-    const key = Buffer.from(SECRET_KEY_FIXA, 'hex');
+    const algorithm = 'aes-128-gcm';
+    const key = Buffer.from(secretKey, 'hex');
     const ivBuffer = Buffer.from(iv, 'hex');
     const authTagBuffer = Buffer.from(authTag, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, ivBuffer);
+
+    const decipher = crypto.createDecipheriv(algorithm, key, ivBuffer);
     decipher.setAuthTag(authTagBuffer);
 
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
 
     const decryptedData = JSON.parse(decrypted);
-    console.log("Dados descriptografados com sucesso!");
-
     const n8nResponse = await fetch(n8nAddWebhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
