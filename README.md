@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Desafio Desenvolvedor Fullstack
 
-## Getting Started
+Este projeto é uma solução, que consiste em criar uma aplicação web completa integrando um backend em Node.js (via Next.js API Routes), um frontend em React (Next.js), um banco de dados PostgreSQL e a ferramenta de automação N8N.
 
-First, run the development server:
+## 🚀 Link para a Aplicação Online
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+A aplicação está disponível para teste no seguinte link:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[**COLE AQUI A URL DO SEU DEPLOY NA VERCEL**](https://COLE_AQUI_A_URL_DO_SEU_DEPLOY_NA_VERCEL)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Funcionalidades
 
-## Learn More
+* **Fluxo de Dados Completo:** Ao clicar em "Executar", a aplicação:
+    1.  Chama uma API backend.
+    2.  A API busca dados de um endpoint externo.
+    3.  Descriptografa esses dados utilizando o algoritmo AES.
+    4.  Envia os dados limpos para um webhook do N8N.
+    5.  O N8N insere os dados em um banco de dados PostgreSQL.
+    6.  Retorna a lista completa de usuários do banco.
+    7.  Exibe os usuários em uma tabela na interface.
+* **Limpeza Dinâmica:** O botão "Limpar" aciona um segundo workflow no N8N que apaga todos os registros da tabela no banco de dados e atualiza a interface em tempo real.
+* **Interface Responsiva:** O design se adapta a diferentes tamanhos de tela, de desktops a dispositivos móveis.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tecnologias Utilizadas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Framework:** [Next.js](https://nextjs.org/) (React)
+* **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+* **Estilização:** [Tailwind CSS](https://tailwindcss.com/)
+* **Componentes UI:** [Shadcn/ui](https://ui.shadcn.com/)
+* **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/) (hospedado na Vercel)
+* **ORM:** [Prisma](https://www.prisma.io/)
+* **Automação de Workflow:** [N8N](https://n8n.io/)
+* **Deploy:** [Vercel](https://vercel.com/)

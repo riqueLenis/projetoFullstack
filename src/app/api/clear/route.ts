@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   const n8nClearWebhookUrl = process.env.N8N_CLEAR_URL;
 
   if (!n8nClearWebhookUrl) {
-    console.error("A variável de ambiente N8N_CLEAR_URL não está definida.");
+    console.error("a variavel de ambiente N8N_CLEAR_URL não esta definida");
     return NextResponse.json(
-      { message: "Erro de configuração no servidor." },
+      { message: "erro de config no servidor." },
       { status: 500 }
     );
   }
@@ -17,18 +17,22 @@ export async function POST(request: Request) {
     });
 
     if (!n8nResponse.ok) {
-      throw new Error(`O N8N respondeu com o status: ${n8nResponse.status}`);
+      throw new Error(`o N8N respondeu com o status: ${n8nResponse.status}`);
     }
-
+    
     return NextResponse.json(
-      { message: 'Dados limpos com sucesso!' },
+      { message: 'dados limpos' },
       { status: 200 }
     );
 
-  } catch (error: any) {
-    console.error("Erro ao chamar o webhook do N8N:", error.message);
+  } catch (error: unknown) {
+    let errorMessage = 'um erro desconhecido ocorreu.';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    console.error("erro ao chamar o webhook do N8N:", errorMessage);
     return NextResponse.json(
-      { message: 'Falha ao executar a limpeza.', error: error.message },
+      { message: 'falha ao executar a limpeza.', error: errorMessage },
       { status: 500 }
     );
   }
