@@ -6,7 +6,7 @@ Este projeto é uma solução, que consiste em criar uma aplicação web complet
 
 A aplicação está disponível para teste no seguinte link:
 
-[**COLE AQUI A URL DO SEU DEPLOY NA VERCEL**](https://COLE_AQUI_A_URL_DO_SEU_DEPLOY_NA_VERCEL)
+[**link**](https://projeto-fullstack-phi.vercel.app/)
 
 ---
 
