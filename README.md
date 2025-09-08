@@ -35,3 +35,7 @@ A aplicação está disponível para teste no seguinte link:
 * **ORM:** [Prisma](https://www.prisma.io/)
 * **Automação de Workflow:** [N8N](https://n8n.io/)
 * **Deploy:** [Vercel](https://vercel.com/)
+
+<img width="1134" height="383" alt="image" src="https://github.com/user-attachments/assets/4f9bb698-7d62-4604-a186-8480d9aba95b" />
+<img width="861" height="504" alt="image" src="https://github.com/user-attachments/assets/18736a9a-0346-4a71-9aa6-ffc5891b9c2d" />
+
