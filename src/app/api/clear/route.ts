@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(_: NextRequest) {
+export async function POST(_request: NextRequest) {
   const n8nClearWebhookUrl = process.env.N8N_CLEAR_URL;
 
   if (!n8nClearWebhookUrl) {
@@ -14,7 +13,8 @@ export async function POST(_: NextRequest) {
 
     if (!n8nResponse.ok) throw new Error(`O n8n respondeu com status: ${n8nResponse.status}`);
 
-    const result = await n8nResponse.json().catch(() => ({}));
+    const result = (await n8nResponse.json()) as Record<string, unknown>;
+
     console.log('Limpeza executada:', result);
 
     return NextResponse.json({ message: 'Dados limpos', details: result }, { status: 200 });

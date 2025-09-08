@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -28,10 +27,10 @@ export default function HomePage() {
         throw new Error(errorData.message || 'Falha ao buscar e processar os dados.');
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as User[];
 
       const normalizedData: User[] = Array.isArray(data)
-        ? data.map((u: any) => ({
+        ? data.map(u => ({
             id: u.id ?? 0,
             nome: u.nome ?? 'N/A',
             email: u.email ?? 'N/A',

@@ -1,9 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-export async function POST(_: NextRequest) {
+interface N8NItem {
+  json?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export async function POST(_request: NextRequest) {
   const encryptedDataUrl = process.env.ENCRYPTED_DATA_URL;
   const n8nAddWebhookUrl = process.env.N8N_ADD_URL;
 
@@ -35,15 +38,13 @@ export async function POST(_: NextRequest) {
       body: JSON.stringify(decryptedData),
     });
 
-    const usersFromN8N = await n8nResponse.json();
-    let finalData;
+    const usersFromN8N: N8NItem[] | N8NItem = await n8nResponse.json();
+    let finalData: Record<string, unknown>[] = [];
 
     if (Array.isArray(usersFromN8N)) {
-      finalData = usersFromN8N.map((item: any) => item.json ?? item);
+      finalData = usersFromN8N.map(item => item.json ?? item);
     } else if (usersFromN8N && typeof usersFromN8N === 'object') {
       finalData = [usersFromN8N.json ?? usersFromN8N];
-    } else {
-      finalData = [];
     }
 
     return NextResponse.json(finalData, { status: 200 });
