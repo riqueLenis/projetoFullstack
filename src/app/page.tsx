@@ -22,25 +22,38 @@ export default function HomePage() {
     try {
       const response = await fetch('/api/execute', { method: 'POST' });
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as { message?: string };
         throw new Error(errorData.message || 'Falha ao buscar e processar os dados.');
       }
-      const data = await response.json();
 
-      const normalizedData = data.map((u: { id: number; nome: string; email: string; phone: string; }) => ({
-        id: u.id ?? 0,
-        nome: u.nome ?? 'N/A',
-        email: u.email ?? 'N/A',
-        phone: u.phone ?? 'N/A',
-      }));
+      const data = (await response.json()) as unknown;
+
+      const normalizedData: User[] = Array.isArray(data)
+        ? data.map((u) => {
+            if (
+              u &&
+              typeof u === 'object' &&
+              'id' in u &&
+              'nome' in u &&
+              'email' in u &&
+              'phone' in u
+            ) {
+              const obj = u as { id: unknown; nome: unknown; email: unknown; phone: unknown };
+              return {
+                id: typeof obj.id === 'number' ? obj.id : 0,
+                nome: typeof obj.nome === 'string' ? obj.nome : 'N/A',
+                email: typeof obj.email === 'string' ? obj.email : 'N/A',
+                phone: typeof obj.phone === 'string' ? obj.phone : 'N/A',
+              };
+            }
+            return { id: 0, nome: 'N/A', email: 'N/A', phone: 'N/A' };
+          })
+        : [];
 
       setUsers(normalizedData);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Ocorreu um erro desconhecido.');
-      }
+      if (err instanceof Error) setError(err.message);
+      else setError('Ocorreu um erro desconhecido.');
     } finally {
       setLoading(false);
     }
@@ -54,11 +67,8 @@ export default function HomePage() {
       if (!response.ok) throw new Error('Falha ao limpar os dados.');
       setUsers([]);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Ocorreu um erro desconhecido.');
-      }
+      if (err instanceof Error) setError(err.message);
+      else setError('Ocorreu um erro desconhecido.');
     } finally {
       setLoading(false);
     }
