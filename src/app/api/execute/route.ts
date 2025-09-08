@@ -1,3 +1,4 @@
+// src/app/api/execute/route.ts
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
@@ -6,12 +7,12 @@ export async function POST(_request: Request) {
   const n8nAddWebhookUrl = process.env.N8N_ADD_URL;
 
   if (!encryptedDataUrl || !n8nAddWebhookUrl) {
-    return NextResponse.json({ message: "erro de config no servidor" }, { status: 500 });
+    return NextResponse.json({ message: "Erro de configuração no servidor." }, { status: 500 });
   }
 
   try {
     const encryptedResponse = await fetch(encryptedDataUrl);
-    if (!encryptedResponse.ok) throw new Error("falha ao buscar os dados criptografados");
+    if (!encryptedResponse.ok) throw new Error("Falha ao buscar os dados criptografados.");
     
     const dataPackage = await encryptedResponse.json();
     
@@ -19,13 +20,14 @@ export async function POST(_request: Request) {
     const { secretKey } = dataPackage.data;
 
     if (!iv || !authTag || !encrypted || !secretKey) {
-        throw new Error("a resposta do endpoint nao contem todos os campos necessarios");
+        throw new Error("A resposta do endpoint não contém todos os campos necessários.");
     }
 
-    const algorithm = 'aes-128-gcm';
+    const algorithm = 'aes-256-gcm';
     const key = Buffer.from(secretKey, 'hex');
     const ivBuffer = Buffer.from(iv, 'hex');
     const authTagBuffer = Buffer.from(authTag, 'hex');
+    
     const decipher = crypto.createDecipheriv(algorithm, key, ivBuffer);
     decipher.setAuthTag(authTagBuffer);
 
@@ -33,25 +35,34 @@ export async function POST(_request: Request) {
     decrypted += decipher.final('utf8');
     
     const decryptedData = JSON.parse(decrypted);
+
     const n8nResponse = await fetch(n8nAddWebhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(decryptedData),
     });
 
-    if (!n8nResponse.ok) throw new Error(`o n8n respondeu com o status: ${n8nResponse.status}`);
+    if (!n8nResponse.ok) throw new Error(`O N8N respondeu com o status: ${n8nResponse.status}`);
 
     const usersFromN8N = await n8nResponse.json();
-    return NextResponse.json(usersFromN8N, { status: 200 });
+    
+    // --- MODO DETETIVE FINAL ---
+    // Vamos imprimir a estrutura exata da resposta do N8N
+    console.log("RESPOSTA FINAL RECEBIDA DO N8N:", JSON.stringify(usersFromN8N, null, 2));
+
+    // Esta linha vai falhar, mas o log acima nos dará a resposta.
+    const finalData = usersFromN8N.map((item: any) => item.json);
+    
+    return NextResponse.json(finalData, { status: 200 });
 
   } catch (error: unknown) {
-    let errorMessage = 'um erro desconhecido ocorreu.';
+    let errorMessage = 'Um erro desconhecido ocorreu.';
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    console.error("ocorreu um erro no fluxo de execução:", errorMessage);
+    console.error("Ocorreu um erro no fluxo de execução:", errorMessage);
     return NextResponse.json(
-      { message: 'ocorreu um erro no fluxo de execução: ' + errorMessage },
+      { message: 'Ocorreu um erro no fluxo de execução: ' + errorMessage },
       { status: 500 }
     );
   }
