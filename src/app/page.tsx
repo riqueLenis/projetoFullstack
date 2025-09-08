@@ -1,8 +1,8 @@
 'use client';
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
 interface User {
   id: number;
   nome: string;
@@ -23,22 +23,23 @@ export default function HomePage() {
       const response = await fetch('/api/execute', { method: 'POST' });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'falha ao buscar e processar os dados');
+        throw new Error(errorData.message || 'Falha ao buscar e processar os dados.');
       }
       const data = await response.json();
-      const normalized = data.map((u: any) => ({
+
+      const normalizedData = data.map((u: { id: number; nome: string; email: string; phone: string; }) => ({
         id: u.id ?? 0,
-        nome: u.nome ?? '',
-        email: u.email ?? '',
-        phone: u.phone ?? '',
+        nome: u.nome ?? 'N/A',
+        email: u.email ?? 'N/A',
+        phone: u.phone ?? 'N/A',
       }));
 
-      setUsers(normalized);
+      setUsers(normalizedData);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Ocorreu um erro');
+        setError('Ocorreu um erro desconhecido.');
       }
     } finally {
       setLoading(false);
@@ -50,13 +51,13 @@ export default function HomePage() {
     setError(null);
     try {
       const response = await fetch('/api/clear', { method: 'POST' });
-      if (!response.ok) throw new Error('falha ao limpar os dados');
+      if (!response.ok) throw new Error('Falha ao limpar os dados.');
       setUsers([]);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('ocorreu um erro.');
+        setError('Ocorreu um erro desconhecido.');
       }
     } finally {
       setLoading(false);
@@ -67,7 +68,7 @@ export default function HomePage() {
     <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12 bg-slate-50 dark:bg-slate-900">
       <div className="z-10 w-full max-w-5xl text-center">
         <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-slate-800 dark:text-slate-100">
-          projeto henrique lenis
+          teste fullstack - henrique lenis
         </h1>
       </div>
 
@@ -104,16 +105,16 @@ export default function HomePage() {
             {!loading && !error && users.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} className="text-center">
-                  a tabela esta vazia clique em executar
+                  a tabela esta vazia clique em EXECUTAR.
                 </TableCell>
               </TableRow>
             )}
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.id}</TableCell>
-                <TableCell>{user.nome || '—'}</TableCell>
-                <TableCell>{user.email || '—'}</TableCell>
-                <TableCell>{user.phone || '—'}</TableCell>
+                <TableCell>{user.nome}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.phone}</TableCell>
               </TableRow>
             ))}
           </TableBody>
