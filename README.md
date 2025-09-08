@@ -1,8 +1,8 @@
-# Desafio Desenvolvedor Fullstack
+# projeto fullstack
 
 Este projeto é uma solução, que consiste em criar uma aplicação web completa integrando um backend em Node.js (via Next.js API Routes), um frontend em React (Next.js), um banco de dados PostgreSQL e a ferramenta de automação N8N.
 
-## 🚀 Link para a Aplicação Online
+## Link para a Aplicação Online
 
 A aplicação está disponível para teste no seguinte link:
 
@@ -10,7 +10,7 @@ A aplicação está disponível para teste no seguinte link:
 
 ---
 
-## ✨ Funcionalidades
+## funcionalidades
 
 * **Fluxo de Dados Completo:** Ao clicar em "Executar", a aplicação:
     1.  Chama uma API backend.
@@ -25,7 +25,7 @@ A aplicação está disponível para teste no seguinte link:
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## tecnologias Utilizadas
 
 * **Framework:** [Next.js](https://nextjs.org/) (React)
 * **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
