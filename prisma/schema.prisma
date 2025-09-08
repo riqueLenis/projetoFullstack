@@ -12,4 +12,7 @@ model User {
   nome  String  @db.VarChar(128)
   email String  @unique @db.VarChar(255)
   phone String  @db.VarChar(20)
+
+  // Linha adicionada para corrigir o nome da tabela no banco de dados
+  @@map("users")
 }
