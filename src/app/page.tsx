@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // Importe o useEffect
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
 interface User {
   id: number;
   nome: string;
@@ -16,12 +15,11 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Função para buscar os dados direto do banco de dados
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/users'); // Chama nossa nova API
+      const response = await fetch('/api/users');
       if (!response.ok) {
         throw new Error('Falha ao buscar usuários do banco de dados.');
       }
@@ -35,7 +33,6 @@ export default function HomePage() {
     }
   };
 
-  // useEffect para buscar os dados quando a página carregar pela primeira vez
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -49,7 +46,6 @@ export default function HomePage() {
         const errorData = (await response.json()) as { message?: string };
         throw new Error(errorData.message || 'Falha ao executar o processo.');
       }
-      // Após executar com sucesso, buscamos os dados atualizados do banco
       await fetchUsers();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -65,7 +61,6 @@ export default function HomePage() {
     try {
       const response = await fetch('/api/clear', { method: 'POST' });
       if (!response.ok) throw new Error('Falha ao limpar os dados.');
-      // Após limpar com sucesso, buscamos os dados (que agora será uma lista vazia)
       await fetchUsers();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -75,7 +70,6 @@ export default function HomePage() {
     }
   };
 
-  // O resto do seu JSX continua exatamente o mesmo...
   return (
     <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12 bg-slate-50 dark:bg-slate-900">
       <div className="z-10 w-full max-w-5xl text-center">
